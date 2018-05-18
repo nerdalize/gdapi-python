@@ -179,7 +179,7 @@ class ClientApiError(Exception):
 
 class Client(object):
     def __init__(self, access_key=None, secret_key=None, url=None, cache=False,
-                 cache_time=86400, strict=False, headers=HEADERS, **kw):
+                 cache_time=86400, strict=False, headers=HEADERS, timeout=None, **kw):
         self._headers = headers
         self._access_key = access_key
         self._secret_key = secret_key
@@ -188,6 +188,7 @@ class Client(object):
         self._cache = cache
         self._cache_time = cache_time
         self._strict = strict
+        self._timeout = timeout
         self.schema = None
         self._session = requests.Session()
 
@@ -261,7 +262,7 @@ class Client(object):
 
     def _get_response(self, url, data=None):
         r = self._session.get(url, auth=self._auth, params=data,
-                              headers=self._headers)
+                              headers=self._headers, timeout=self._timeout)
         if r.status_code < 200 or r.status_code >= 300:
             self._error(r.text)
 
@@ -270,7 +271,7 @@ class Client(object):
     @timed_url
     def _post(self, url, data=None):
         r = self._session.post(url, auth=self._auth, data=self._marshall(data),
-                               headers=self._headers)
+                               headers=self._headers, timeout=self._timeout)
         if r.status_code < 200 or r.status_code >= 300:
             self._error(r.text)
 
@@ -279,7 +280,7 @@ class Client(object):
     @timed_url
     def _put(self, url, data=None):
         r = self._session.put(url, auth=self._auth, data=self._marshall(data),
-                              headers=self._headers)
+                              headers=self._headers, timeout=self._timeout)
         if r.status_code < 200 or r.status_code >= 300:
             self._error(r.text)
 
@@ -287,7 +288,7 @@ class Client(object):
 
     @timed_url
     def _delete(self, url):
-        r = self._session.delete(url, auth=self._auth, headers=self._headers)
+        r = self._session.delete(url, auth=self._auth, headers=self._headers, timeout=self._timeout)
         if r.status_code < 200 or r.status_code >= 300:
             self._error(r.text)
 
